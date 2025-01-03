@@ -31,7 +31,7 @@ export default function MessageList() {
     const [_, setPage] = useAtom(activePageAtom);
     const [otherUser, setOtherUser] = useAtom(otherUserAtom);
     const [messages, setMessages] = useAtom(messagesAtom);
-    const [profile, setProfile] = useAtom(profileAtom);
+    const [profile ] = useAtom(profileAtom);
 
     const [avatarUrls, setAvatarUrls] = useState<AvatarCache>({});
     const [actionsTwoOpened, setActionsTwoOpened] = useState(false);
@@ -214,11 +214,6 @@ export default function MessageList() {
             console.error('Failed to process QR code:', error);
         }
     }
-
-    async function gotoMessageDetailt() {
-
-    }
-
 
 
     return (

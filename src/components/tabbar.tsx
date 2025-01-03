@@ -5,7 +5,7 @@ import {
     Tabbar,
     TabbarLink
 } from 'konsta/react';
-import { MdEmail, MdToday, MdMonetizationOn, MdOutlinePersonPin } from 'react-icons/md';
+import { MdEmail, MdMonetizationOn, MdOutlinePersonPin } from 'react-icons/md';
 //import { invoke } from '@tauri-apps/api/core';
 import { activePageAtom, ActivePage, unreadCountAtom } from '../state/app_state';
 

@@ -11,11 +11,11 @@ import { profileAtom } from '../state/app_state';
 import { useAtom } from 'jotai';
 
 export default function ProfileComp() {
-    const [profile, setProfile] = useAtom(profileAtom);
+    const [profile, _] = useAtom(profileAtom);
 
     const downloadQR = async () => {
         try {
-            const svg = document.getElementById("QRCode");
+            const svg = document.getElementById("QRCode") as HTMLElement;
             const svgData = new XMLSerializer().serializeToString(svg);
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");

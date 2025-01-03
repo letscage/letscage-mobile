@@ -1,5 +1,4 @@
 /* eslint-disable react/no-array-index-key */
-import { useState, useRef, useEffect, act } from 'react';
 import {
   App
 } from 'konsta/react';
@@ -14,7 +13,7 @@ import Profile from './pages/profile';
 import MessageDetail from './pages/messagedetail';
 
 export default function MyApp() {
-  const [activePage, setActivePage] = useAtom(activePageAtom);
+  const [activePage, _] = useAtom(activePageAtom);
   return (<>
     <App theme="material" dark={false}>
       {activePage === 'inbox' && <MessageList />}

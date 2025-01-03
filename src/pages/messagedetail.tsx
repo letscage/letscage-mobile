@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Page,
   Navbar,
   NavbarBackLink,
   Messages,
   Message,
-  MessagesTitle,
   Messagebar,
   Link,
   Icon,
@@ -31,9 +30,9 @@ interface ChatMessage {
 
 export default function MessageDetail() {
   const [_, setPage] = useAtom(activePageAtom);
-  const [profile, setProfile] = useAtom(profileAtom);
-  const [otherUser, setOtherUser] = useAtom(otherUserAtom);
-  const [currentUser, setCurrentUser] = useState(profile.currentUser);
+  const [profile ] = useAtom(profileAtom);
+  const [otherUser ] = useAtom(otherUserAtom);
+  const [currentUser ] = useState(profile.currentUser);
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
 
@@ -144,7 +143,7 @@ export default function MessageDetail() {
       />
       <div className="h-[calc(100vh-88px)] overflow-y-auto">
         <Messages className="messages-content">
-          {messages.map((msg, index) => (
+          {messages.map((msg) => (
             <Message
               key={msg.message_id}
               type={msg.from_user === currentUser ? 'sent' : 'received'}

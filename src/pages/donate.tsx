@@ -1,12 +1,12 @@
 import { Page, Block, Card, Button, Navbar, Toast } from 'konsta/react';
 import { useState } from 'react';
-import { FaHeart, FaBitcoin, FaEthereum } from 'react-icons/fa';
+import { FaBitcoin, FaEthereum } from 'react-icons/fa';
 import { SiMonero } from 'react-icons/si';
 import TabbarComponent from '../components/tabbar';
 
 export default function DonateComp() {
     const [toastOpen, setToastOpen] = useState(false);
-    const [copiedAddress, setCopiedAddress] = useState('');
+    const [copiedAddress, _] = useState('');
 
     const cryptoAddresses = [
         {
