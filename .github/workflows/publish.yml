@@ -29,6 +29,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clone Arti Repository
+        run: |
+          git clone https://gitlab.torproject.org/tpo/core/arti.git ./arti
+          cd arti
+          git checkout main
+
       - name: setup node
         uses: actions/setup-node@v4
         with:
