@@ -59,10 +59,6 @@ jobs:
       - name: install frontend dependencies
         run: yarn install # change this to npm, pnpm or bun depending on which one you use.
 
-      - name: Enable Debug Logging
-        env:
-          ACTIONS_STEP_DEBUG: true
-
       - uses: m00dy/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
