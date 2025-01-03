@@ -63,7 +63,7 @@ jobs:
         env:
           ACTIONS_STEP_DEBUG: true
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: m00dy/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
