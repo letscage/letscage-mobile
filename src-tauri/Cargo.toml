@@ -1,0 +1,64 @@
+[package]
+name = "letscage-mobile"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "letscage_mobile_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+anyhow = "1.0.75"
+arti-client = { path = "../../arti/crates/arti-client", features = [
+    "onion-service-service",
+    "static",
+    "onion-service-client"
+] }
+arti = { path = "../../arti/crates/arti", features = [
+    "experimental-api"
+] }
+futures = "0.3.14"
+hyper = { version = "1", features = ["http1", "server"] }
+hyper-util = { version = "0.1.1", features = ["tokio"] }
+safelog = { path = "../../arti/crates/safelog" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
+tokio-util = "0.7.10"
+tor-cell = { path = "../../arti/crates/tor-cell" }
+tor-hsservice = { path = "../../arti/crates/tor-hsservice" }
+tor-proto = { path = "../../arti/crates/tor-proto" }
+tor-config-path = { path = "../../arti/crates/tor-config-path"}
+tor-rtcompat = { path = "../../arti/crates/tor-rtcompat" }
+tor-config = { path = "../../arti/crates/tor-config" }
+tower = { version = "0.5.1", features = ["util", "tracing"] }
+tracing-subscriber = "0.3.0"
+tauri-plugin-log = "2"
+log = "0.4.22"
+rand = "0.8.5"
+reqwest = { version = "0.12.11", features = ["blocking", "socks"] }
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+uuid = "1.11.0"
+rusqlite = "0.32.1"
+axum = "0.8.1"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.14.1"
+jni = "0.21.1"
+ndk = "0.9.0"
+ndk-glue = "0.7.0"
