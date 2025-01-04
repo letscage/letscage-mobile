@@ -85,7 +85,7 @@ jobs:
 
       - name: Rename APK file
         run: |
-          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/myapplication-${{ steps.package-version.outputs.current-version }}.apk
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/letscage-mobile-${{ steps.package-version.outputs.current-version }}.apk
 
       - name: Publish
         uses: softprops/action-gh-release@v1
@@ -95,7 +95,7 @@ jobs:
           tag_name: v${{ steps.package-version.outputs.current-version }}
           generate_release_notes: true
           files: |
-            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/myapplication-${{ steps.package-version.outputs.current-version }}.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/letscage-mobile-${{ steps.package-version.outputs.current-version }}.apk
 
   publish-tauri:
     if: false # Temporarily skipping this job
