@@ -27,6 +27,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Print GitHub workspace
+        run: echo "${{ github.workspace }}"
+
+      - name: Clone Arti Repository
+        run: |
+          git clone --branch main --single-branch https://gitlab.torproject.org/tpo/core/arti.git ../arti
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
