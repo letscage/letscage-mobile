@@ -91,14 +91,13 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          name: App v${{ steps.package-version.outputs.current-version }}
+          name: Letscage-mobile v${{ steps.package-version.outputs.current-version }}
           tag_name: v${{ steps.package-version.outputs.current-version }}
           generate_release_notes: true
           files: |
             ./src-tauri/gen/android/app/build/outputs/apk/universal/release/letscage-mobile-${{ steps.package-version.outputs.current-version }}.apk
 
   publish-tauri:
-    if: false # Temporarily skipping this job
     permissions:
       contents: write
     strategy:
@@ -151,8 +150,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: letscage-v__VERSION__
-          releaseName: 'Letscage v__VERSION__'
+          name: Letscage Desktop v__VERSION__
+          tagName: letscage-desktop-v__VERSION__
+          releaseName: 'Letscage Desktop v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
