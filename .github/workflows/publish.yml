@@ -44,7 +44,7 @@ jobs:
         run: sdkmanager "ndk;27.0.11902837"
 
       - name: Add NDK toolchain to PATH
-        run: echo "export PATH=$ANDROID_HOME/ndk/27.0.11902837/toolchains/llvm/prebuilt/linux-x86_64/bin:\$PATH" >> $GITHUB_ENV
+        run: echo "$ANDROID_HOME/ndk/27.0.11902837/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
 
       - name: Setup Node
         uses: actions/setup-node@v4
