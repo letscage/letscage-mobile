@@ -36,9 +36,7 @@ jobs:
         
       - name: Clone Arti Repository
         run: |
-          git clone https://gitlab.torproject.org/tpo/core/arti.git ./arti
-          cd arti
-          git checkout main
+          git clone --branch main --single-branch https://gitlab.torproject.org/tpo/core/arti.git ../arti
 
       - name: setup node
         uses: actions/setup-node@v4
