@@ -20,6 +20,8 @@ import jsQR from 'jsqr';
 import { open } from '@tauri-apps/plugin-dialog';
 import { readFile } from '@tauri-apps/plugin-fs';
 import { Message, messagesAtom } from '../state/app_state';
+import { scan, Format } from '@tauri-apps/plugin-barcode-scanner';
+import { Toast, Button } from 'konsta/react';
 
 interface AvatarCache {
     [key: string]: string;
@@ -28,10 +30,13 @@ interface AvatarCache {
 
 
 export default function MessageList() {
+    const [toastOpen, setToastOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+
     const [_, setPage] = useAtom(activePageAtom);
     const [otherUser, setOtherUser] = useAtom(otherUserAtom);
     const [messages, setMessages] = useAtom(messagesAtom);
-    const [profile ] = useAtom(profileAtom);
+    const [profile] = useAtom(profileAtom);
 
     const [avatarUrls, setAvatarUrls] = useState<AvatarCache>({});
     const [actionsTwoOpened, setActionsTwoOpened] = useState(false);
@@ -112,6 +117,29 @@ export default function MessageList() {
         setIsFabVisible(true);
     };
 
+    async function start_camera_scan() {
+        scan({ windowed: true, formats: [Format.QRCode] })
+            .then((scanned) => {
+                setToastMessage(`Scanned: ${JSON.stringify(scanned, null, 2)}`);
+                if(scanned.content) {
+                    setOtherUser(scanned.content);
+                    setPage('message_detail');
+                }
+                setToastOpen(true);
+                setTimeout(() => setToastOpen(false), 2000);
+            })
+            .catch((err) => {
+                console.log('Error object:', err);
+                console.log('Error stringified:', JSON.stringify(err, null, 2));
+                console.log('Error properties:', Object.getOwnPropertyNames(err));
+                
+                setToastMessage(`Scan failed: Please give permission to use camera`);
+                setToastOpen(true);
+                setTimeout(() => setToastOpen(false), 2000);
+                handleActionsClose();
+            });
+    }
+
     async function upload_qr_code() {
         try {
             // Open file dialog
@@ -184,6 +212,14 @@ export default function MessageList() {
 
     return (
         <Page>
+            <Toast
+                position="center"
+                opened={toastOpen}
+                button={<Button clear>OK</Button>}
+            >
+                {toastMessage}
+            </Toast>
+
             <Navbar title="Messages" />
             {/* Center Bottom */}
             {isFabVisible && (
@@ -242,7 +278,7 @@ export default function MessageList() {
                 onBackdropClick={handleActionsClose}
             >
                 <ActionsGroup>
-                    <ActionsButton onClick={handleActionsClose} bold>
+                    <ActionsButton onClick={start_camera_scan} bold>
                         Scan QR code via camera
                     </ActionsButton>
                     <ActionsButton onClick={upload_qr_code}>

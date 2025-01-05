@@ -752,6 +752,13 @@
     "@tauri-apps/cli-win32-ia32-msvc" "2.1.0"
     "@tauri-apps/cli-win32-x64-msvc" "2.1.0"
 
+"@tauri-apps/plugin-barcode-scanner@~2":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-barcode-scanner/-/plugin-barcode-scanner-2.2.0.tgz#981a611c0763d6697e7fcd9601daa196d35ffba3"
+  integrity sha512-16AgAjNZGS790KXTW2oq7K0YKUCxLmlDlizN7+pBvIcZzdR3kYzHSST/CYSXkAkYRParyHmE2nMsMvqJFAHKbA==
+  dependencies:
+    "@tauri-apps/api" "^2.0.0"
+
 "@tauri-apps/plugin-clipboard-manager@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-clipboard-manager/-/plugin-clipboard-manager-2.2.0.tgz#3d8f60457da3054454d93dd3fb5a3ca10eef0e5b"

@@ -182,7 +182,12 @@ pub fn run() {
         }
     ];
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_barcode_scanner::init());
+
+    builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
@@ -206,19 +211,12 @@ pub fn run() {
             let path_as_str = path.to_str().unwrap_or_default().to_string();
             log::info!("Path: {:?}", path);
 
-            //ANDROID
             #[cfg(target_os = "android")]
             start_android_service(path_as_str.clone());
 
-            //DESKTOP
             #[cfg(not(target_os = "android"))]
             start_desktop_service(path_as_str.clone());
 
-            //spawn profiler_setter here
-            // Spawn profiler_setter
-            //tokio::spawn(async move {
-            //    profiler_setter(&app_handle, path.clone()).await;
-            ///});
             spawn(profiler_setter(app_handle, path_as_str.clone()));
 
             Ok(())
