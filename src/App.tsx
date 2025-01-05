@@ -19,7 +19,7 @@ type ProfileReceved = string;
 
 export default function MyApp() {
   const [activePage, _] = useAtom(activePageAtom);
-  const [p, setProfile] = useAtom(profileAtom);
+  const [, setProfile] = useAtom(profileAtom);
 
   listen<ProfileReceved>('profile', (event) => {
     setProfile({

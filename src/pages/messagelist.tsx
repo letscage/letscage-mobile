@@ -100,21 +100,6 @@ export default function MessageList() {
         return m.unread === 1 && m.from_user != profile.currentUser;
     };
 
-    function generate_random_msg_id(): string {
-        // Create array for random bytes
-        const array = new Uint8Array(16);
-        // Fill with random values
-        crypto.getRandomValues(array);
-        // Convert to hex string
-        const randomHex = Array.from(array)
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-        // Add timestamp prefix
-        const timestamp = Date.now().toString(36);
-        // Combine timestamp and random hex
-        return `${timestamp}-${randomHex}`;
-    }
-
     // Update triggerActions function
     async function triggerActions() {
         setActionsTwoOpened(true);
