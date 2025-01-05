@@ -115,25 +115,6 @@ export default function MessageList() {
         return `${timestamp}-${randomHex}`;
     }
 
-    async function test_insert() {
-        const from_user = "jg3of2ccax2szaiq6yqgmrvzos76gvq5ksemys6fpukdxnyxauskh5id.onion";
-        const to_user = "sr3kf2oogkpyuhaywam7zeilaetl3gbjhf72o5fjj7gvsjec6wvdnfid.onion";
-        const message = "This is a very long message here baby :) can you hear me ?????";
-        const msg_id = await generate_random_msg_id();
-
-        Database.load('sqlite:letscage.db').then((db) => {
-            db.execute(`
-                INSERT INTO messages (from_user, to_user, message_id, content) 
-                VALUES (?, ?, ?, ?)`,
-                [from_user, to_user, msg_id, message]
-            ).then((result) => {
-                console.log('Message saved:', result);
-            }).catch((err) => {
-                console.error('Failed to save message:', err);
-            });
-        });
-    }
-
     // Update triggerActions function
     async function triggerActions() {
         setActionsTwoOpened(true);
@@ -281,9 +262,6 @@ export default function MessageList() {
                     </ActionsButton>
                     <ActionsButton onClick={upload_qr_code}>
                         Upload QR code image
-                    </ActionsButton>
-                    <ActionsButton onClick={test_insert}>
-                        test insert
                     </ActionsButton>
                 </ActionsGroup>
                 <ActionsGroup>

@@ -30,8 +30,9 @@ export interface Profile {
 }
 
 export const activePageAtom = atom<ActivePage>('inbox');
+//fix it
 export const profileAtom = atom<Profile>({
-    currentUser: 'jg3of2ccax2szaiq6yqgmrvzos76gvq5ksemys6fpukdxnyxauskh5id.onion'
+    currentUser: 'nmcywxh2pv3lwzf3fwxwq7aq5klpzcuicmzaul4mjyvtvst4ajwz42qd.onion'
 });
 
 export const otherUserAtom = atom<string>('');

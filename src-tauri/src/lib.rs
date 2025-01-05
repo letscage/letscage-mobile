@@ -26,6 +26,10 @@ use log::LevelFilter;
 mod background;
 pub use background::arti_start;
 
+mod profile;
+pub use profile::*;
+
+
 pub fn start_android_service(app_config_path: &PathBuf) {
     use std::process::Command;
 

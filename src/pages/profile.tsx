@@ -12,6 +12,7 @@ import { useAtom } from 'jotai';
 
 export default function ProfileComp() {
     const [profile, _] = useAtom(profileAtom);
+    console.log('profile atom is ', profile.currentUser);
 
     const downloadQR = async () => {
         try {

@@ -55,6 +55,8 @@ use std::env;
 use arti_client::config::CfgPathResolver;
 use std::borrow::Cow;
 
+use crate::get_or_create_profile;
+
 struct WebHandler {
     shutdown: CancellationToken,
 }
@@ -156,6 +158,7 @@ pub fn set_home_properly() {
     path_resolver.set_var("USER_HOME", Ok(Cow::Owned(app_user_home_path)));
 }
 
+
 pub async fn arti_start(config_path: Option<PathBuf>) -> Result<()> {
     #[cfg(target_os = "android")]
     android_logger::init_once(
@@ -201,9 +204,11 @@ pub async fn arti_start(config_path: Option<PathBuf>) -> Result<()> {
 
     // Setup onion service
     let client = Arc::new(client);
+    let generated_nickname = get_or_create_profile(config_path.clone()).nickname;
     let svc_cfg = OnionServiceConfigBuilder::default()
-        .nickname("allium-ampeloprasumqq2mq".parse()?)
+        .nickname(generated_nickname.parse()?)
         .build()?;
+
     let (service, request_stream) = client.launch_onion_service(svc_cfg)?;
     let mut onion_addr = String::from("");
     if let Some(onion) = service.onion_name() {
