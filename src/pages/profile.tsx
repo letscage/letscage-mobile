@@ -73,6 +73,11 @@ export default function ProfileComp() {
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">
                         Your Onion Address
                     </h2>
+                    <div className="w-64 bg-gray-50 rounded-lg p-3 mb-4">
+                        <p className="font-mono text-sm truncate text-center">
+                            {profile.currentUser}
+                        </p>
+                    </div>
                     <p className="text-gray-600 text-sm">
                         Scan this QR code to connect with others
                     </p>

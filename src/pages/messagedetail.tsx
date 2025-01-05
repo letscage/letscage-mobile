@@ -139,6 +139,7 @@ export default function MessageDetail() {
     <Page>
       <Navbar
         title={otherUser}
+        titleClassName="truncate max-w-[200px] text-center mx-auto"
         left={<NavbarBackLink onClick={() => setPage('inbox')} />}
       />
       <div className="h-[calc(100vh-88px)] overflow-y-auto">
