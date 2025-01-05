@@ -29,6 +29,7 @@ pub use background::arti_start;
 mod profile;
 pub use profile::*;
 
+use tauri::async_runtime::spawn;
 
 pub fn start_android_service(app_config_path: &PathBuf) {
     use std::process::Command;
@@ -91,6 +92,7 @@ pub fn perform_background_task(config_path: Option<PathBuf>) {
         }
     });
 }
+
 
 #[cfg(target_os = "android")]
 #[no_mangle]
@@ -171,6 +173,7 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
+            let app_handle = app.handle().clone();
             let path = app.path().resolve("", BaseDirectory::AppConfig)?;
             log::info!("Path: {:?}", path);
 
@@ -181,6 +184,13 @@ pub fn run() {
             //DESKTOP
             #[cfg(not(target_os = "android"))]
             start_desktop_service(&path);
+
+            //spawn profiler_setter here
+            // Spawn profiler_setter
+            //tokio::spawn(async move {
+            //    profiler_setter(&app_handle, path.clone()).await;
+            ///});
+            spawn(profiler_setter(app_handle, path.clone()));
 
             Ok(())
         })

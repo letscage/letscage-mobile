@@ -1,12 +1,39 @@
-use rusqlite::{Connection, Result};
+use rusqlite::{Connection};
 use std::path::PathBuf;
 use uuid::Uuid;
-use std::fs;
+use std::fs as std_fs;
+use tauri::{AppHandle, Emitter};
+use std::io::{self, Result};
+use tokio::fs;
+use tokio::time::{self, Duration};
 
 pub struct ProfileInfo {
     pub id: String,
     pub nickname: String,
 }
+
+pub async fn profiler_setter(app: AppHandle, config_path: PathBuf) {
+    let mut interval = time::interval(Duration::from_secs(3));
+
+    loop {
+        interval.tick().await;
+        
+        if let Ok(addr) = read_tor_addr_from_file(Some(config_path.clone())).await {
+            let _ = app.emit("profile", addr);
+        }
+    }
+}
+
+pub async fn read_tor_addr_from_file(path: Option<PathBuf>) -> Result<String> {
+    let file_path = format!(
+        "{}/onion_addr.txt",
+        path.as_ref().unwrap().to_str().unwrap()
+    );
+
+    let onion_addr = fs::read_to_string(file_path).await?;
+    Ok(onion_addr)
+}
+
 
 pub fn write_tor_addr_to_file(path: Option<PathBuf>, onion_addr: String) -> Result<()> {
     let file_path = format!(
@@ -14,7 +41,7 @@ pub fn write_tor_addr_to_file(path: Option<PathBuf>, onion_addr: String) -> Resu
         path.as_ref().unwrap().to_str().unwrap()
     );
     
-    fs::write(file_path, onion_addr);
+    std_fs::write(file_path, onion_addr)?;
 
     Ok(())
 }

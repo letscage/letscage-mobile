@@ -56,6 +56,7 @@ use arti_client::config::CfgPathResolver;
 use std::borrow::Cow;
 
 use crate::get_or_create_profile;
+use crate::write_tor_addr_to_file;
 
 struct WebHandler {
     shutdown: CancellationToken,
@@ -215,6 +216,8 @@ pub async fn arti_start(config_path: Option<PathBuf>) -> Result<()> {
         log::info!("Onion address: {}", onion);
         onion_addr = format!("{}", onion);
     }
+
+    write_tor_addr_to_file(config_path.clone(), onion_addr.clone());
 
     //let shutdown = CancellationToken::new();
     // Axum router
