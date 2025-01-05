@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FaBitcoin, FaEthereum } from 'react-icons/fa';
 import { SiMonero } from 'react-icons/si';
 import TabbarComponent from '../components/tabbar';
+import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager';
 
 export default function DonateComp() {
     const [toastOpen, setToastOpen] = useState(false);
@@ -29,11 +30,16 @@ export default function DonateComp() {
         }
     ];
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-        //setCopiedAddress(text);
-        setToastOpen(true);
-        setTimeout(() => setToastOpen(false), 2000);
+    const copyToClipboard = async (text: string): Promise<void> => {
+        try {
+            await writeText(text);
+            const content = await readText();
+            console.log('Copied content:', content);
+            setToastOpen(true);
+            setTimeout(() => setToastOpen(false), 2000);
+        } catch (error) {
+            console.error('Failed to copy:', error);
+        }
     };
 
     return (

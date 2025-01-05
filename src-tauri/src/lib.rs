@@ -49,7 +49,8 @@ pub fn start_android_service(app_config_path: String) {
     let mut cmd = Command::new("am");
     cmd.args(&[
         "start-foreground-service",
-        "--user", &user_id.to_string(),  // Run as current user
+        "--user",
+        &user_id.to_string(), // Run as current user
         "-n",
         &format!("{}/{}", package_name, service_name),
         "-e",
@@ -103,7 +104,6 @@ pub fn perform_background_task(config_path: String) {
     });
 }
 
-
 #[cfg(target_os = "android")]
 #[no_mangle]
 pub extern "C" fn Java_com_letscage_1mobile_app_BackgroundServiceNative_invokeRustBackgroundTask(
@@ -124,9 +124,14 @@ pub extern "C" fn Java_com_letscage_1mobile_app_BackgroundServiceNative_invokeRu
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 async fn send_message(to: String, msg: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    let path: PathBuf = app_handle.path().resolve("", BaseDirectory::AppConfig).unwrap();
+    let path: PathBuf = app_handle
+        .path()
+        .resolve("", BaseDirectory::AppConfig)
+        .unwrap();
     let path_as_str = path.to_str().unwrap_or_default().to_string();
-    let my_tor_addr = read_tor_addr_from_file(Some(path_as_str.clone())).await.unwrap_or_default();
+    let my_tor_addr = read_tor_addr_from_file(Some(path_as_str.clone()))
+        .await
+        .unwrap_or_default();
     let proxy = reqwest::Proxy::http("socks5h://127.0.0.1:9050").unwrap();
     let client = Client::builder()
         .proxy(proxy)
@@ -152,7 +157,10 @@ async fn send_message(to: String, msg: String, app_handle: tauri::AppHandle) -> 
     let body = response.text().await.map_err(|_| ())?;
     log::info!("Server response: {}", body);
 
-    Ok(format!("Message posted to {}, with content '{}', response was: {}", to, msg, body))
+    Ok(format!(
+        "Message posted to {}, with content '{}', response was: {}",
+        to, msg, body
+    ))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -175,6 +183,7 @@ pub fn run() {
     ];
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_log::Builder::new().build())

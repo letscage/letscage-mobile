@@ -56,6 +56,7 @@ tauri-plugin-dialog = "2"
 uuid = "1.11.0"
 rusqlite = "0.32.1"
 axum = "0.8.1"
+tauri-plugin-clipboard-manager = "2.2.0"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.14.1"

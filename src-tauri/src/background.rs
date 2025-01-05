@@ -1,6 +1,6 @@
-use futures::StreamExt;
 use arti::socks;
 use arti_client::{TorClient, TorClientConfig};
+use futures::StreamExt;
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::Response;
@@ -21,7 +21,10 @@ use ndk_glue::native_activity;
 use std::sync::Arc;
 use tauri::Manager;
 
+use hyper::Method;
+use rusqlite::Connection;
 use serde::Deserialize;
+use std::error::Error;
 use tokio::select;
 use tokio::task;
 use tokio_util::sync::CancellationToken;
@@ -32,28 +35,25 @@ use tor_hsservice::StreamRequest;
 use tor_proto::stream::IncomingStreamRequest;
 use tor_rtcompat::PreferredRuntime;
 use uuid::Uuid;
-use hyper::Method;
-use rusqlite::Connection;
-use std::error::Error;
 
 use anyhow::Result;
-use hyper::body::Incoming;
-use hyper::Request;
-use hyper_util::rt::{TokioExecutor, TokioIo};
-use hyper_util::server;
-use tower::Service;
 use axum::{
     body::Body,
-    extract::{State, Json},
+    extract::{Json, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
     Router,
 };
+use hyper::body::Incoming;
+use hyper::Request;
+use hyper_util::rt::{TokioExecutor, TokioIo};
+use hyper_util::server;
+use tower::Service;
 
-use std::env;
 use arti_client::config::CfgPathResolver;
 use std::borrow::Cow;
+use std::env;
 
 use crate::get_or_create_profile;
 use crate::write_tor_addr_to_file;
@@ -72,7 +72,6 @@ struct AppState {
     onion_addr: String,
 }
 
-
 async fn root_handler() -> impl IntoResponse {
     (StatusCode::OK, "Hello, World!")
 }
@@ -82,10 +81,7 @@ async fn message_handler(
     State(state): State<Arc<AppState>>,
     Json(message): Json<IncomingMessage>,
 ) -> impl IntoResponse {
-    let db_path = format!(
-        "{}/letscage.db",
-        state.config_path.clone()
-    );
+    let db_path = format!("{}/letscage.db", state.config_path.clone());
 
     let conn = match Connection::open(&db_path) {
         Ok(conn) => conn,
@@ -123,8 +119,12 @@ fn build_app(state: Arc<AppState>) -> Router {
         .with_state(state)
 }
 
-async fn handle_stream_request(stream_request: StreamRequest, router: Router, onion_addr: String,
-    config_path: String) -> Result<()> {
+async fn handle_stream_request(
+    stream_request: StreamRequest,
+    router: Router,
+    onion_addr: String,
+    config_path: String,
+) -> Result<()> {
     match stream_request.request() {
         IncomingStreamRequest::Begin(begin) if begin.port() == 80 => {
             let onion_service_stream = stream_request.accept(Connected::new_empty()).await?;
@@ -147,7 +147,6 @@ async fn handle_stream_request(stream_request: StreamRequest, router: Router, on
     Ok(())
 }
 
-
 #[cfg(target_os = "android")]
 pub fn set_home_properly(config_path: String) {
     /*Set HOME */
@@ -158,7 +157,6 @@ pub fn set_home_properly(config_path: String) {
     let app_user_home_path = PathBuf::from(APP_USER_HOME);
     path_resolver.set_var("USER_HOME", Ok(Cow::Owned(app_user_home_path)));
 }
-
 
 pub async fn arti_start(config_path: String) -> Result<()> {
     #[cfg(target_os = "android")]
@@ -223,11 +221,10 @@ pub async fn arti_start(config_path: String) -> Result<()> {
     // Axum router
     let state = Arc::new(AppState {
         config_path: config_path.clone(),
-        onion_addr: onion_addr.clone()
+        onion_addr: onion_addr.clone(),
     });
 
     let router = build_app(state.clone());
-
 
     let onion_task = task::spawn(async move {
         let mut requests = tor_hsservice::handle_rend_requests(request_stream);
@@ -236,7 +233,8 @@ pub async fn arti_start(config_path: String) -> Result<()> {
             let pbuff = config_path.clone();
             let router_clone = router.clone();
             tokio::spawn(async move {
-                if let Err(err) = handle_stream_request(stream_request, router_clone, onion_clone, pbuff).await
+                if let Err(err) =
+                    handle_stream_request(stream_request, router_clone, onion_clone, pbuff).await
                 {
                     log::info!("Error serving request: {}", err);
                 }

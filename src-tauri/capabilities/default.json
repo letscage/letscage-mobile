@@ -18,6 +18,9 @@
     "fs:default",
     "fs:allow-download-read",
     "fs:allow-download-write",
-    "dialog:default"
+    "dialog:default",
+    "clipboard-manager:default",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-text"
   ]
 }

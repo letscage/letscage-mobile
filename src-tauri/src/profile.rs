@@ -1,10 +1,10 @@
-use rusqlite::{Connection};
-use uuid::Uuid;
+use rusqlite::Connection;
 use std::fs as std_fs;
-use tauri::{AppHandle, Emitter};
 use std::io::{self, Result};
+use tauri::{AppHandle, Emitter};
 use tokio::fs;
 use tokio::time::{self, Duration};
+use uuid::Uuid;
 
 pub struct ProfileInfo {
     pub id: String,
@@ -16,7 +16,7 @@ pub async fn profiler_setter(app: AppHandle, config_path: String) {
 
     loop {
         interval.tick().await;
-        
+
         if let Ok(addr) = read_tor_addr_from_file(Some(config_path.clone())).await {
             let _ = app.emit("profile", addr);
         }
@@ -24,33 +24,22 @@ pub async fn profiler_setter(app: AppHandle, config_path: String) {
 }
 
 pub async fn read_tor_addr_from_file(path: Option<String>) -> Result<String> {
-    let file_path = format!(
-        "{}/onion_addr.txt",
-        path.unwrap()
-    );
+    let file_path = format!("{}/onion_addr.txt", path.unwrap());
 
     let onion_addr = fs::read_to_string(file_path).await?;
     Ok(onion_addr)
 }
 
-
 pub fn write_tor_addr_to_file(path: String, onion_addr: String) -> Result<()> {
-    let file_path = format!(
-        "{}/onion_addr.txt",
-        path.clone()
-    );
-    
+    let file_path = format!("{}/onion_addr.txt", path.clone());
+
     std_fs::write(file_path, onion_addr)?;
 
     Ok(())
 }
 
-
 pub fn get_or_create_profile(path: String) -> ProfileInfo {
-    let db_path = format!(
-        "{}/letscage.db",
-        path.clone()
-    );
+    let db_path = format!("{}/letscage.db", path.clone());
 
     log::info!("DB path is: {}", db_path);
 
@@ -67,17 +56,12 @@ pub fn get_or_create_profile(path: String) -> ProfileInfo {
     .expect("Failed to create table");
 
     // Try to get existing profile
-    let profile = conn
-        .query_row(
-            "SELECT id, nickname FROM profile LIMIT 1",
-            [],
-            |row| {
-                Ok(ProfileInfo {
-                    id: row.get(0)?,
-                    nickname: row.get(1)?,
-                })
-            },
-        );
+    let profile = conn.query_row("SELECT id, nickname FROM profile LIMIT 1", [], |row| {
+        Ok(ProfileInfo {
+            id: row.get(0)?,
+            nickname: row.get(1)?,
+        })
+    });
 
     match profile {
         Ok(profile) => profile,
