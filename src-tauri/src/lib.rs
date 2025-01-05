@@ -124,9 +124,9 @@ pub extern "C" fn Java_com_letscage_1mobile_app_BackgroundServiceNative_invokeRu
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 async fn send_message(to: String, msg: String, app_handle: tauri::AppHandle) -> Result<String, ()> {
-    let binding = app_handle.path().app_data_dir().unwrap();
-    let app_data_dir = binding.to_str().unwrap();
-    log::info!("Tauri app data dir: {:?}", app_data_dir);
+    let path: PathBuf = app_handle.path().resolve("", BaseDirectory::AppConfig).unwrap();
+    let path_as_str = path.to_str().unwrap_or_default().to_string();
+    let my_tor_addr = read_tor_addr_from_file(Some(path_as_str.clone())).await.unwrap_or_default();
     let proxy = reqwest::Proxy::http("socks5h://127.0.0.1:9050").unwrap();
     let client = Client::builder()
         .proxy(proxy)
@@ -136,7 +136,7 @@ async fn send_message(to: String, msg: String, app_handle: tauri::AppHandle) -> 
 
     // Prepare JSON payload for POST
     let payload = serde_json::json!({
-        "from": to,
+        "from": my_tor_addr,
         "content": msg
     });
 
