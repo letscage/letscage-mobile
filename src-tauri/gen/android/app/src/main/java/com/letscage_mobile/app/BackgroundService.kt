@@ -32,8 +32,16 @@ class BackgroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Call your Rust background logic here
-        BackgroundServiceNative.invokeRustBackgroundTask()
+        // Get config path from intent extras
+        val configPath = intent?.getStringExtra("config_path") ?: ""
+        
+        // Start foreground notification
+        //createNotificationChannel()
+        //startForeground(NOTIFICATION_ID, createNotification())
+        
+        // Invoke Rust with config path
+        BackgroundServiceNative.invokeRustBackgroundTask(configPath)
+        
         return START_STICKY
     }
 

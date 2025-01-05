@@ -6,5 +6,5 @@ object BackgroundServiceNative {
     }
 
     @JvmStatic
-    external fun invokeRustBackgroundTask(): Int
+    external fun invokeRustBackgroundTask(configPath: String): Int
 }

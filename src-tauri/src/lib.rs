@@ -31,22 +31,33 @@ pub use profile::*;
 
 use tauri::async_runtime::spawn;
 
-pub fn start_android_service(app_config_path: &PathBuf) {
+pub fn start_android_service(app_config_path: String) {
     use std::process::Command;
 
-    // Define the package name and service class name
     let package_name = "com.letscage_mobile.app";
     let service_name = ".BackgroundService";
 
-    // Build the shell command to start the service
+    // Get current user ID
+    let user_id = Command::new("am")
+        .args(&["get-current-user"])
+        .output()
+        .ok()
+        .and_then(|output| String::from_utf8(output.stdout).ok())
+        .and_then(|s| s.trim().parse::<i32>().ok())
+        .unwrap_or(0);
+
     let mut cmd = Command::new("am");
     cmd.args(&[
         "start-foreground-service",
+        "--user", &user_id.to_string(),  // Run as current user
         "-n",
         &format!("{}/{}", package_name, service_name),
+        "-e",
+        "config_path",
+        &app_config_path,
     ]);
 
-    log::info!("Cmd is {:?}", cmd);
+    log::info!("Cmd with args is {:?}", cmd);
 
     match cmd.output() {
         Ok(output) => {
@@ -66,12 +77,11 @@ pub fn start_android_service(app_config_path: &PathBuf) {
     }
 }
 
-pub fn start_desktop_service(config_path: &PathBuf) {
-    let config = config_path.clone();
-    std::thread::spawn(|| perform_background_task(Some(config)));
+pub fn start_desktop_service(config_path: String) {
+    std::thread::spawn(move || perform_background_task(config_path.clone()));
 }
 
-pub fn perform_background_task(config_path: Option<PathBuf>) {
+pub fn perform_background_task(config_path: String) {
     let runtime = match tokio::runtime::Runtime::new() {
         Ok(rt) => rt,
         Err(e) => {
@@ -97,9 +107,18 @@ pub fn perform_background_task(config_path: Option<PathBuf>) {
 #[cfg(target_os = "android")]
 #[no_mangle]
 pub extern "C" fn Java_com_letscage_1mobile_app_BackgroundServiceNative_invokeRustBackgroundTask(
+    mut env: JNIEnv,
+    _: JClass,
+    config_path: JString,
 ) -> jint {
-    std::thread::spawn(|| perform_background_task(None));
-    42 // Return an integer as an example
+    // Convert JString to Rust's String
+    let config_path: String = env
+        .get_string(&config_path)
+        .expect("Couldn't get java string!")
+        .into();
+
+    std::thread::spawn(move || perform_background_task(config_path));
+    42
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -174,23 +193,24 @@ pub fn run() {
         )
         .setup(|app| {
             let app_handle = app.handle().clone();
-            let path = app.path().resolve("", BaseDirectory::AppConfig)?;
+            let path: PathBuf = app.path().resolve("", BaseDirectory::AppConfig)?;
+            let path_as_str = path.to_str().unwrap_or_default().to_string();
             log::info!("Path: {:?}", path);
 
             //ANDROID
             #[cfg(target_os = "android")]
-            start_android_service(&path);
+            start_android_service(path_as_str.clone());
 
             //DESKTOP
             #[cfg(not(target_os = "android"))]
-            start_desktop_service(&path);
+            start_desktop_service(path_as_str.clone());
 
             //spawn profiler_setter here
             // Spawn profiler_setter
             //tokio::spawn(async move {
             //    profiler_setter(&app_handle, path.clone()).await;
             ///});
-            spawn(profiler_setter(app_handle, path.clone()));
+            spawn(profiler_setter(app_handle, path_as_str.clone()));
 
             Ok(())
         })

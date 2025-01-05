@@ -1,5 +1,4 @@
 use rusqlite::{Connection};
-use std::path::PathBuf;
 use uuid::Uuid;
 use std::fs as std_fs;
 use tauri::{AppHandle, Emitter};
@@ -12,7 +11,7 @@ pub struct ProfileInfo {
     pub nickname: String,
 }
 
-pub async fn profiler_setter(app: AppHandle, config_path: PathBuf) {
+pub async fn profiler_setter(app: AppHandle, config_path: String) {
     let mut interval = time::interval(Duration::from_secs(3));
 
     loop {
@@ -24,10 +23,10 @@ pub async fn profiler_setter(app: AppHandle, config_path: PathBuf) {
     }
 }
 
-pub async fn read_tor_addr_from_file(path: Option<PathBuf>) -> Result<String> {
+pub async fn read_tor_addr_from_file(path: Option<String>) -> Result<String> {
     let file_path = format!(
         "{}/onion_addr.txt",
-        path.as_ref().unwrap().to_str().unwrap()
+        path.unwrap()
     );
 
     let onion_addr = fs::read_to_string(file_path).await?;
@@ -35,10 +34,10 @@ pub async fn read_tor_addr_from_file(path: Option<PathBuf>) -> Result<String> {
 }
 
 
-pub fn write_tor_addr_to_file(path: Option<PathBuf>, onion_addr: String) -> Result<()> {
+pub fn write_tor_addr_to_file(path: String, onion_addr: String) -> Result<()> {
     let file_path = format!(
         "{}/onion_addr.txt",
-        path.as_ref().unwrap().to_str().unwrap()
+        path.clone()
     );
     
     std_fs::write(file_path, onion_addr)?;
@@ -47,11 +46,13 @@ pub fn write_tor_addr_to_file(path: Option<PathBuf>, onion_addr: String) -> Resu
 }
 
 
-pub fn get_or_create_profile(path: Option<PathBuf>) -> ProfileInfo {
+pub fn get_or_create_profile(path: String) -> ProfileInfo {
     let db_path = format!(
         "{}/letscage.db",
-        path.as_ref().unwrap().to_str().unwrap()
+        path.clone()
     );
+
+    log::info!("DB path is: {}", db_path);
 
     let conn = Connection::open(&db_path).expect("Failed to open database");
 

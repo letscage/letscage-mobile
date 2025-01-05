@@ -4,6 +4,7 @@ use arti_client::{TorClient, TorClientConfig};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::Response;
+use std::path::PathBuf;
 
 #[cfg(target_os = "android")]
 use jni::{
@@ -30,7 +31,6 @@ use tor_hsservice::config::OnionServiceConfigBuilder;
 use tor_hsservice::StreamRequest;
 use tor_proto::stream::IncomingStreamRequest;
 use tor_rtcompat::PreferredRuntime;
-use std::path::PathBuf;
 use uuid::Uuid;
 use hyper::Method;
 use rusqlite::Connection;
@@ -68,7 +68,7 @@ struct IncomingMessage {
 }
 
 struct AppState {
-    config_path: Option<PathBuf>,
+    config_path: String,
     onion_addr: String,
 }
 
@@ -84,7 +84,7 @@ async fn message_handler(
 ) -> impl IntoResponse {
     let db_path = format!(
         "{}/letscage.db",
-        state.config_path.as_ref().unwrap().to_str().unwrap()
+        state.config_path.clone()
     );
 
     let conn = match Connection::open(&db_path) {
@@ -124,7 +124,7 @@ fn build_app(state: Arc<AppState>) -> Router {
 }
 
 async fn handle_stream_request(stream_request: StreamRequest, router: Router, onion_addr: String,
-    config_path: Option<PathBuf>) -> Result<()> {
+    config_path: String) -> Result<()> {
     match stream_request.request() {
         IncomingStreamRequest::Begin(begin) if begin.port() == 80 => {
             let onion_service_stream = stream_request.accept(Connected::new_empty()).await?;
@@ -149,10 +149,10 @@ async fn handle_stream_request(stream_request: StreamRequest, router: Router, on
 
 
 #[cfg(target_os = "android")]
-pub fn set_home_properly() {
+pub fn set_home_properly(config_path: String) {
     /*Set HOME */
-    const APP_BASE_DIR: &str = "/data/user/0/com.letscage_mobile.app";
-    let APP_USER_HOME = format!("{}/{}", APP_BASE_DIR, "home");
+    let APP_USER_HOME = format!("{}{}", config_path, "home");
+    log::info!("Home is set to {}", APP_USER_HOME);
     env::set_var("HOME", APP_USER_HOME.as_str());
     let mut path_resolver = CfgPathResolver::default();
     let app_user_home_path = PathBuf::from(APP_USER_HOME);
@@ -160,16 +160,16 @@ pub fn set_home_properly() {
 }
 
 
-pub async fn arti_start(config_path: Option<PathBuf>) -> Result<()> {
+pub async fn arti_start(config_path: String) -> Result<()> {
     #[cfg(target_os = "android")]
     android_logger::init_once(
         android_logger::Config::default()
             //.with_max_level(LevelFilter::Trace)
-            .with_tag("{{app.name}}"),
+            .with_tag("{{com.letscage-mobile}}"),
     );
 
     #[cfg(target_os = "android")]
-    set_home_properly();
+    set_home_properly(config_path.clone());
 
     // Setup handler with cancellation
     let handler = Arc::new(WebHandler {
