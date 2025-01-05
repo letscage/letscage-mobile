@@ -205,7 +205,7 @@ pub async fn arti_start(config_path: Option<PathBuf>) -> Result<()> {
     // Setup onion service
     let client = Arc::new(client);
     let generated_nickname = get_or_create_profile(config_path.clone()).nickname;
-    let svc_cfg = OnionServiceConfigBuilder::default()
+    let svc_cfg: tor_hsservice::OnionServiceConfig = OnionServiceConfigBuilder::default()
         .nickname(generated_nickname.parse()?)
         .build()?;
 
